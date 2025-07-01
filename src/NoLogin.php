@@ -18,11 +18,16 @@ class NoLogin
 
     private Encrypter $encrypter;
 
-    public function __construct(private string $url, private readonly string $clientId, #[SensitiveParameter] private readonly string $clientSecret, array $options = [])
+    public function __construct(private string $url, private readonly string $clientId, #[SensitiveParameter] private string $clientSecret, array $options = [])
     {
         if (empty($this->url) || empty($this->clientId) || empty($this->clientSecret)) {
             throw new InvalidArgumentException('NoLogin URL, Client ID, and Client Secret must be provided.');
         }
+        $clientSecret = base64_decode($this->clientSecret);
+        if ($clientSecret === false) {
+            throw new InvalidArgumentException('Client Secret must be a valid base64 encoded string.');
+        }
+        $this->clientSecret = $clientSecret;
         $this->url = str_starts_with($this->url, 'http') ? $this->url : 'https://'.$this->url;
         if (str_ends_with($this->url, '/')) {
             $this->url = rtrim($this->url, '/');
