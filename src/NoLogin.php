@@ -37,7 +37,7 @@ class NoLogin
             'oAuthPath' => '/nologin/oauth',
             'oAuthApiPath' => '/api/nologin/auth',
             'oAuthApiMethod' => 'POST',
-            'oAuthApiTimeout' => 10,
+            'oAuthApiTimeout' => 20,
         ], $options);
         $this->encrypter = new Encrypter($this->clientSecret, SupportedCiphers::AES_256_CBC);
     }
@@ -126,23 +126,20 @@ class NoLogin
         }
         $url = $this->url . $apiPath;
         $content = [
-            'client_id' => $this->clientId,
             'user_id' => $userId,
-            'token' => $token,
             'time' => $now,
-            'hash' => hash_hmac('sha256', $clientId . '|' . $userId . '|' . $token . '|' . $now, $this->clientSecret),
         ];
         $client = new Client([
             RequestOptions::HEADERS => [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ],
-            RequestOptions::TIMEOUT => $this->options['oAuthApiTimeout'] ?? 10,
+            RequestOptions::TIMEOUT => $this->options['oAuthApiTimeout'] ?? 20,
             RequestOptions::AUTH => [
                 $this->clientId,
                 $token,
             ],
-            'hash' => hash_hmac('sha512', implode('|', $content), $this->clientSecret, true),
+            'hash' => hash_hmac('sha256', $clientId . '|' . $userId . '|' . $token . '|' . $now, $this->clientSecret),
         ]);
         try {
             $response = $client->request($this->options['oAuthApiMethod'], $url, [
