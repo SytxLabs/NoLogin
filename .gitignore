@@ -1,0 +1,7 @@
+.idea
+.git
+vendor
+tests/logs
+tests/deduplicate.log
+.phpunit.cache
+example.php

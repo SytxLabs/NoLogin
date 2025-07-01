@@ -1,0 +1,51 @@
+{
+  "name": "sytxlabs/nologin",
+  "description": "This module adds a cross-site login system to the platform. It allows users to log in to the platform without having to enter their credentials again if they are already logged in on another site.",
+  "type": "library",
+  "license": "MIT",
+  "version": "1.0.2",
+  "keywords": [
+    "nobyte",
+    "nologin",
+    "cross-site login",
+    "single sign-on",
+    "sso",
+    "authentication"
+  ],
+  "authors": [
+    {
+      "name": "Shaun Lüdeke",
+      "email": "info@sytxlabs.eu",
+      "homepage": "https://sytxlabs.eu",
+      "role": "Developer"
+    }
+  ],
+  "homepage": "https://sytxlabs.eu",
+  "readme": "README.md",
+  "autoload": {
+    "psr-4": {
+      "SytxLabs\\NoLogin\\": "src/"
+    }
+  },
+  "require": {
+    "ext-openssl": "*",
+    "ext-mbstring": "*",
+    "php": "^8.2|^8.3|^8.4",
+    "guzzlehttp/guzzle": "^7.9.3"
+  },
+  "require-dev": {
+    "portavice/laravel-pint-config": "^2.0"
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  },
+  "scripts": {
+    "cs": "pint --config vendor/portavice/laravel-pint-config/pint.json --test",
+    "csfix": "pint --config vendor/portavice/laravel-pint-config/pint.json"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
