@@ -20,7 +20,7 @@ class Encrypter
 
     public function __construct(string $key, array|string|SupportedCiphers $cipher = 'aes-128-cbc')
     {
-        if (($k = base64_decode($key)) !== false) {
+        if (($k = base64_decode($key, true)) !== false) {
             $key = $k;
         }
         if (! static::supported($key, $cipher)) {
