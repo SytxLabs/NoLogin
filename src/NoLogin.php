@@ -23,9 +23,9 @@ class NoLogin
         if (empty($this->url) || empty($this->clientId) || empty($this->clientSecret)) {
             throw new InvalidArgumentException('NoLogin URL, Client ID, and Client Secret must be provided.');
         }
-        $clientSecret = base64_decode($this->clientSecret);
-        if ($clientSecret === false) {
-            throw new InvalidArgumentException('Client Secret must be a valid base64 encoded string.');
+        $cSecret = base64_decode($clientSecret, true);
+        if ($cSecret !== false) {
+            $clientSecret = $cSecret;
         }
         $this->clientSecret = $clientSecret;
         $this->url = str_starts_with($this->url, 'http') ? $this->url : 'https://'.$this->url;
@@ -99,7 +99,7 @@ class NoLogin
             throw new InvalidArgumentException('Invalid code provided for NoLogin request.', 0, $e);
         }
         $parts = explode('|', $code, 5);
-        if (count($parts) !== 3) {
+        if (count($parts) !== 5) {
             throw new InvalidArgumentException('Invalid code format provided for NoLogin request.');
         }
         [$clientId, $userId, $token, $time, $hash] = $parts;
@@ -133,13 +133,13 @@ class NoLogin
             RequestOptions::HEADERS => [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
+                'hash' => hash_hmac('sha256', $clientId . '|' . $userId . '|' . $token . '|' . $now, $this->clientSecret),
             ],
             RequestOptions::TIMEOUT => $this->options['oAuthApiTimeout'] ?? 20,
             RequestOptions::AUTH => [
                 $this->clientId,
                 $token,
             ],
-            'hash' => hash_hmac('sha256', $clientId . '|' . $userId . '|' . $token . '|' . $now, $this->clientSecret),
         ]);
         try {
             $response = $client->request($this->options['oAuthApiMethod'], $url, [
@@ -160,9 +160,9 @@ class NoLogin
             throw new InvalidArgumentException('NoLogin API request failed with invalid JSON response.');
         }
         try {
-            $decryptedContent = $this->encrypter->decryptString($result['content'] ?? '');
+            $decryptedContent = $this->encrypter->decrypt($result['content'] ?? '');
             $content = json_decode($decryptedContent, true, 512, JSON_THROW_ON_ERROR);
-            if ($result['hash'] !== hash_hmac('sha512', $decryptedContent, $this->clientSecret, true)) {
+            if ($result['hash'] !== hash_hmac('sha512', $result['content'], $this->clientSecret)) {
                 throw new InvalidArgumentException('NoLogin API response hash does not match.');
             }
             return new NoLoginApiResponse(

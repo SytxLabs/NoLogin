@@ -149,7 +149,11 @@ class Encrypter
      */
     public function decryptString(#[SensitiveParameter] string $payload): string
     {
-        return (string) $this->decrypt($payload, false)->__toString();
+        $result = $this->decrypt($payload, false);
+        if (!is_string($result)) {
+            return $result->__toString();
+        }
+        return $result;
     }
 
     /**
@@ -176,7 +180,7 @@ class Encrypter
             throw new DecryptException('The payload is invalid.');
         }
         [$payload, $hash] = explode('|', $payload, 2);
-        if (!hash_equals(hash('sha512', $payload), $hash)) {
+        if ($hash !== hash('sha512', base64_decode($payload))) {
             throw new DecryptException('The payload is invalid.');
         }
         try {
