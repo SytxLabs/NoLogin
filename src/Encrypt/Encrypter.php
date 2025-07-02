@@ -20,6 +20,9 @@ class Encrypter
 
     public function __construct(string $key, array|string|SupportedCiphers $cipher = 'aes-128-cbc')
     {
+        if (($k = base64_decode($key)) !== false) {
+            $key = $k;
+        }
         if (! static::supported($key, $cipher)) {
             throw new RuntimeException('Unsupported cipher or incorrect key length. Supported ciphers are: ' . implode(', ', array_map(static fn ($s) => $s->value, SupportedCiphers::cases())) . '.');
         }
