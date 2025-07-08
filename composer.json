@@ -3,7 +3,7 @@
   "description": "This module adds a cross-site login system to the platform. It allows users to log in to the platform without having to enter their credentials again if they are already logged in on another site.",
   "type": "library",
   "license": "MIT",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "keywords": [
     "nobyte",
     "nologin",
